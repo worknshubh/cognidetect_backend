@@ -27,7 +27,7 @@ def get_model():
     global model
     if model is None:
         model = tf.keras.models.load_model(
-            "alzheimer_model.h5",
+            "alzheimer_model_v2.keras",
             compile=False
         )
     return model
