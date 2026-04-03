@@ -107,7 +107,7 @@ def predict():
         img = Image.open(io.BytesIO(mri_file.read())).convert("L")
         img = img.resize((180, 180))
 
-        mri_arr = np.array(img, dtype=np.float32) / 255.0
+        mri_arr = np.array(img, dtype=np.float32) 
         mri_arr = mri_arr.reshape(1, 180, 180, 1)
 
         model = get_model()
