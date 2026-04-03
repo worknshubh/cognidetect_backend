@@ -1,5 +1,5 @@
-flask
-flask-cors
+flask==3.0.0
+flask-cors==4.0.0
 numpy==1.24.3
-pillow
+pillow==10.3.0
 tensorflow-cpu==2.13.0
