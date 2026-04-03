@@ -23,13 +23,59 @@ CLASS_NAMES = [
 ]
 
 
+def build_model():
+    data_aug = tf.keras.Sequential([
+        tf.keras.layers.RandomFlip("horizontal"),
+        tf.keras.layers.RandomRotation(0.05),
+        tf.keras.layers.RandomZoom(0.1),
+        tf.keras.layers.RandomContrast(factor=[0,0.1]),
+    ])
+    m = tf.keras.Sequential([
+        tf.keras.Input(shape=(180, 180, 1)),
+        data_aug,
+        tf.keras.layers.Rescaling(1./255),
+        tf.keras.layers.Conv2D(16, 3, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(16, 3, activation='relu'),
+        tf.keras.layers.MaxPooling2D(),
+        tf.keras.layers.Conv2D(32, 3, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(32, 3, activation='relu'),
+        tf.keras.layers.MaxPooling2D(),
+        tf.keras.layers.BatchNormalization(momentum=0.99, epsilon=0.001),
+        tf.keras.layers.Conv2D(64, 3, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(64, 3, activation='relu'),
+        tf.keras.layers.MaxPooling2D(),
+        tf.keras.layers.BatchNormalization(momentum=0.99, epsilon=0.001),
+        tf.keras.layers.Conv2D(128, 3, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(128, 3, activation='relu'),
+        tf.keras.layers.MaxPooling2D(),
+        tf.keras.layers.BatchNormalization(momentum=0.99, epsilon=0.001),
+        tf.keras.layers.Conv2D(256, 3, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(256, 3, activation='relu'),
+        tf.keras.layers.MaxPooling2D(),
+        tf.keras.layers.BatchNormalization(momentum=0.99, epsilon=0.001),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dropout(0.25),
+        tf.keras.layers.Dense(1024, activation='relu'),
+        tf.keras.layers.Dropout(0.6),
+        tf.keras.layers.BatchNormalization(momentum=0.99, epsilon=0.001),
+        tf.keras.layers.Dense(512, activation='relu'),
+        tf.keras.layers.Dropout(0.4),
+        tf.keras.layers.BatchNormalization(momentum=0.99, epsilon=0.001),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.25),
+        tf.keras.layers.BatchNormalization(momentum=0.99, epsilon=0.001),
+        tf.keras.layers.Dense(4, activation='softmax'),
+    ])
+    return m
+
 def get_model():
     global model
     if model is None:
-        model = tf.keras.models.load_model(
-            "alzheimer_model_v2.keras",
-            compile=False
-        )
+        import numpy as np
+        model = build_model()
+        model.predict(np.zeros((1, 180, 180, 1)))
+        weights = np.load("model_weights.npy", allow_pickle=True)
+        model.set_weights(weights)
     return model
 
 
